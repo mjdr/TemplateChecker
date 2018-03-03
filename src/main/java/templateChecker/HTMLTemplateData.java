@@ -1,6 +1,7 @@
 package templateChecker;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -349,6 +350,10 @@ public class HTMLTemplateData {
 				return true;
 		
 		return false;
+	}
+	
+	public static void addEntry(List<String> list, String title, Collection<String> params) {
+		list.add(title+"("+ params.size() +"): " + params.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
 	}
 	
 }

@@ -74,7 +74,7 @@ public class HTMLTemplate {
 				.collect(Collectors.toSet());
 		
 		if(ids.size() > 0)
-			errors.add("Template has ids: " + ids.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(errors, "Template has ids", ids);
 			
 		
 		Set<String> badClasses = classes.stream()
@@ -84,7 +84,7 @@ public class HTMLTemplate {
 				.collect(Collectors.toSet());
 
 		if(badClasses.size() > 0)
-			errors.add("Template has \"bad\" named classes("+ badClasses.size() +"): " + badClasses.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(errors, "Template has \"bad\" named classes", badClasses);
 		
 		if(document.select("script").size() > 0)
 			errors.add("Template has script tag");
@@ -109,13 +109,19 @@ public class HTMLTemplate {
 		
 		if(!res) return;
 		
-		List<String>inTemplate = classes.stream().filter((c) -> !cssTemplate.getClasses().contains(c)).filter(c -> !c.startsWith("js_")).collect(Collectors.toList());
-		List<String>inCSS = cssTemplate.getClasses().stream().filter((c) -> !classes.contains(c)).collect(Collectors.toList());
+		List<String>inTemplate = classes.stream()
+				.filter((c) -> !cssTemplate.getClasses().contains(c)).filter(c -> !c.startsWith("js_"))
+				.filter((c) -> !HTMLTemplateData.isExcuceClass(c))
+				.collect(Collectors.toList());
+		List<String>inCSS = cssTemplate.getClasses().stream()
+				.filter((c) -> !classes.contains(c))
+				.filter((c) -> !HTMLTemplateData.isExcuceClass(c))
+				.collect(Collectors.toList());
 		
 		if(inTemplate.size() > 0)
-			warnings.add("Template useless classes: " + inTemplate.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(warnings, "Template useless classes: ", inTemplate);
 		if(inCSS.size() > 0)
-			warnings.add("CSS useless classes: " + inCSS.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(warnings, "CSS useless classes: ", inCSS);
 		
 		
 		

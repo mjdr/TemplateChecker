@@ -45,10 +45,9 @@ public class CSSTemplate {
 		
 		if(matcher.find())
 			name = matcher.group(1);
-		else {
-			errors.add("Template has wrong name");
-			return true;
-		}
+		else
+			errors.add("CSS has wrong name");
+			
 		String css;
     	try {
 			css = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
@@ -68,25 +67,27 @@ public class CSSTemplate {
     	
     	
     	if(getIds().size() > 0)
-			errors.add("CSS has ids: " + getIds().stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+    		HTMLTemplateData.addEntry(errors, "CSS has ids: ", getIds());
 		
+    	
 		Set<String> cssBadClasses = getClasses().stream()
 				.filter((c) -> !c.startsWith(name + "_"))
+				.filter((c) -> !HTMLTemplateData.isExcuceClass(c))
 				.collect(Collectors.toSet());
 		
 		if(cssBadClasses.size() > 0)
-			errors.add("CSS has \"bad\" named classes("+ cssBadClasses.size() +"): " + cssBadClasses.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(errors, "CSS has \"bad\" named classes", cssBadClasses);
 		
     	
     	if(parser.getComments().size() > 0)
     		warnings.add("CSS Comments("+parser.getComments().size()+")");
-    	
+		
     	Set<String> redefClasses = getClasses().stream()
 				.filter((c) -> HTMLTemplateData.isExcuceClass(c))
 				.collect(Collectors.toSet());
     	
     	if(redefClasses.size() > 0)
-			errors.add("CSS has re defiend classes("+ redefClasses.size() +"): " + redefClasses.stream().reduce("\n\t\t\t", (acc, c) -> acc + c + "\n\t\t\t"));
+			HTMLTemplateData.addEntry(errors, "CSS has re defiend classes", redefClasses);
 		
     	
     	return true;
